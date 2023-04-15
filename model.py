@@ -15,31 +15,39 @@ class CNNModel(nn.Module):
 		## define the model architecture here
 		## MNIST image input size batch * 28 * 28 (one input channel)
 		##-----------------------------------------------------------
-		
+
+		conv_channel_out = args.channel_out2
+
 		## define CNN layers below
-		self.conv = nn.sequential( 	# nn.Conv2d(in_channels,...),
-									# activation fun,
-									# batch normalization (bonus),
-									# dropout,
-									# nn.Conv2d(in_channels,...),
-									# batch normalization (bonus),
-									# activation fun,
-									# dropout,
-									## continue like above,
-									## **define pooling (bonus)**,
+		self.conv = nn.sequential( 	nn.Conv2d(in_channels=1, out_channels=args.channel_out1, kernel_size=args.kernel_size, stride=args.stride),
+									nn.relu(),
+									nn.BatchNorm2d(args.channel_out1),
+									nn.dropout(args.dropout),
+									nn.Conv2d(in_channels=args.channel_out1, out_channels=args.channel_out2, kernel_size=args.kernel_size, stride=args.stride),
+									nn.relu(),
+									nn.BatchNorm2d(args.channel_out2),
+									nn.dropout(args.dropout),
+									nn.Conv2d(in_channels=args.channel_out2, out_channels=conv_channel_out, kernel_size=args.kernel_size, stride=args.stride),
+									nn.relu(),
+									nn.BatchNorm2d(conv_channel_out),
+									nn.dropout(args.dropout),
 									
+									nn.MaxPool2d(args.pooling_size, stride=args.max_stride)
+
 								)
 
 		##-------------------------------------------------
 		## write code to define fully connected layers below
 		##-------------------------------------------------
-		in_size = 
-		out_size = 
+		in_size = conv_channel_out
+		out_size = 10
 		# self.fc = nn.Linear(in_size, out_size)
 
-		self.fc = nn.sequential( # nn.Linear(in_size, out_1),
-								 # activation fun,
-								 # nn.Linear(out_1, out_size),
+		self.fc = nn.sequential( nn.Linear(in_size, args.fc_hidden1),
+								 nn.relu(),
+								 nn.Linear(args.fc_hidden1, args.fc_hidden2),
+								 nn.relu(),
+								 nn.Linear(args.fc_hidden2, out_size)
 								)
 		
 
@@ -49,7 +57,7 @@ class CNNModel(nn.Module):
 		##---------------------------------------------------------
 		## write code to feed input features to the CNN models defined above
 		##---------------------------------------------------------
-		x_out = 
+		x_out = self.conv(x)
 
 		## write flatten tensor code below (it is done)
 		x = torch.flatten(x_out,1) # x_out is output of last layer
@@ -58,7 +66,7 @@ class CNNModel(nn.Module):
 		## ---------------------------------------------------
 		## write fully connected layer (Linear layer) below
 		## ---------------------------------------------------
-		result =   # predict y
+		result = self.fc(x)  # predict y
 		
 		
 		return result

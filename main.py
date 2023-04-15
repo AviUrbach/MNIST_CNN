@@ -73,7 +73,7 @@ def _compute_accuracy(y_pred, y_batch):
 	## --------------------------------------------
 	## write the code of computing accuracy below
 	## --------------------------------------------
-	accy = 1 - (y_batch-y_pred).count_nonzero()/len(y_pred)
+	accy = len(y_pred) - (y_batch-y_pred).count_nonzero()
 	return accy
 	
 
@@ -135,6 +135,8 @@ def main():
 	
 	##  model training
 	iteration = 0
+	cumulative_accuracy = 0 #number of correct predictions in this k batches
+	num_predictions = 0
 	if args.mode == 'train':
 		model = model.train() ## model training
 		for epoch in range(num_epoches): #10-50
@@ -168,7 +170,8 @@ def main():
 				##------------------------------------------------------
 				# _, y_pred = torch.max(output_y.data, 1)
 				y_pred = torch.argmax(output_y.data, 1)
-				accuracy = _compute_accuracy(y_pred, y_labels)
+				cumulative_accuracy += _compute_accuracy(y_pred, y_labels)
+				num_predictions += len(y_pred)
 				
 				
 				##----------------------------------------------------------
@@ -176,10 +179,10 @@ def main():
 				## if use loss.item(), you may use log txt files to save loss
 				##----------------------------------------------------------
 				if iteration % 30 == 0:
-					print(f'epoch: {epoch}, batch#: {batch_id}, loss: {loss.item()}, accuracy: {accuracy}')
+					print(f'epoch: {epoch}, batch#: {batch_id}, loss: {loss.item()}, accuracy: {cumulative_accuracy/num_predictions}')
 
 					wandb.log({'iteration': iteration, 'loss': loss})
-					wandb.log({'iteration': iteration, 'accuracy': accuracy})
+					wandb.log({'iteration': iteration, 'accuracy': cumulative_accuracy/num_predictions})
 				
 				
 
@@ -214,7 +217,7 @@ def main():
 			## complete code for computing the accuracy below
 			##---------------------------------------------------
 			total += len(y_labels)
-			accy_count += _compute_accuracy(y_pred, y_labels)*len(y_labels)
+			accy_count += _compute_accuracy(y_pred, y_labels)
 		print("Testing Accuracy:", accy_count/total)
 	
 		
