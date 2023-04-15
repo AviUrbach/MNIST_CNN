@@ -203,6 +203,7 @@ def main():
 	##------------------------------------
 	model.eval()
 	accy_count = 0
+	total = 0
 	with torch.no_grad():
 		for batch_id, (x_batch,y_labels) in enumerate(test_loader):
 			x_batch, y_labels = Variable(x_batch).to(device), Variable(y_labels).to(device)

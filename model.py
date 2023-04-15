@@ -1,6 +1,7 @@
 """
 define moduals of model
 """
+from torch import flatten
 from torch.autograd import Variable
 import torch.nn.functional as F
 import torch.nn as nn
@@ -19,18 +20,18 @@ class CNNModel(nn.Module):
 		conv_channel_out = args.channel_out2
 
 		## define CNN layers below
-		self.conv = nn.sequential( 	nn.Conv2d(in_channels=1, out_channels=args.channel_out1, kernel_size=args.kernel_size, stride=args.stride),
-									nn.relu(),
+		self.conv = nn.Sequential( 	nn.Conv2d(in_channels=1, out_channels=args.channel_out1, kernel_size=args.k_size, stride=args.stride),
+									nn.ReLU(),
 									nn.BatchNorm2d(args.channel_out1),
-									nn.dropout(args.dropout),
-									nn.Conv2d(in_channels=args.channel_out1, out_channels=args.channel_out2, kernel_size=args.kernel_size, stride=args.stride),
-									nn.relu(),
+									nn.Dropout(args.dropout),
+									nn.Conv2d(in_channels=args.channel_out1, out_channels=args.channel_out2, kernel_size=args.k_size, stride=args.stride),
+									nn.ReLU(),
 									nn.BatchNorm2d(args.channel_out2),
-									nn.dropout(args.dropout),
-									nn.Conv2d(in_channels=args.channel_out2, out_channels=conv_channel_out, kernel_size=args.kernel_size, stride=args.stride),
-									nn.relu(),
+									nn.Dropout(args.dropout),
+									nn.Conv2d(in_channels=args.channel_out2, out_channels=conv_channel_out, kernel_size=args.k_size, stride=args.stride),
+									nn.ReLU(),
 									nn.BatchNorm2d(conv_channel_out),
-									nn.dropout(args.dropout),
+									nn.Dropout(args.dropout),
 									
 									nn.MaxPool2d(args.pooling_size, stride=args.max_stride)
 
@@ -39,14 +40,14 @@ class CNNModel(nn.Module):
 		##-------------------------------------------------
 		## write code to define fully connected layers below
 		##-------------------------------------------------
-		in_size = conv_channel_out
+		in_size = conv_channel_out * 81
 		out_size = 10
 		# self.fc = nn.Linear(in_size, out_size)
 
-		self.fc = nn.sequential( nn.Linear(in_size, args.fc_hidden1),
-								 nn.relu(),
+		self.fc = nn.Sequential( nn.Linear(in_size, args.fc_hidden1),
+								 nn.ReLU(),
 								 nn.Linear(args.fc_hidden1, args.fc_hidden2),
-								 nn.relu(),
+								 nn.ReLU(),
 								 nn.Linear(args.fc_hidden2, out_size)
 								)
 		
@@ -60,7 +61,7 @@ class CNNModel(nn.Module):
 		x_out = self.conv(x)
 
 		## write flatten tensor code below (it is done)
-		x = torch.flatten(x_out,1) # x_out is output of last layer
+		x = flatten(x_out,1) # x_out is output of last layer
 		
 
 		## ---------------------------------------------------
