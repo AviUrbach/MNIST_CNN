@@ -74,7 +74,7 @@ def _compute_accuracy(y_pred, y_batch):
 	## write the code of computing accuracy below
 	## --------------------------------------------
 	accy = len(y_pred) - (y_batch-y_pred).count_nonzero()
-	return accy
+	return accy.item()
 	
 
 
@@ -179,7 +179,7 @@ def main():
 				## if use loss.item(), you may use log txt files to save loss
 				##----------------------------------------------------------
 				if iteration % 30 == 0:
-					print(f'epoch: {epoch}, batch#: {batch_id}, loss: {loss.item()}, accuracy: {cumulative_accuracy/num_predictions}')
+					print(f'epoch: {epoch}, batch#: {batch_id+1}, loss: {loss.item()}, accuracy: {cumulative_accuracy/num_predictions}')
 
 					wandb.log({'iteration': iteration, 'loss': loss})
 					wandb.log({'iteration': iteration, 'accuracy': cumulative_accuracy/num_predictions})
